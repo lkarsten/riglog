@@ -1,0 +1,16 @@
+#!/bin/bash
+# ./$0 interval count cmd
+
+interval=$1
+count=$2
+shift
+shift
+
+for i in `seq 1 $count`; do
+    date "+%s.%N " | tr -d '\n'
+    eval $*
+    if [ $i == $count ]; then
+	break
+    fi
+    sleep $interval
+done
