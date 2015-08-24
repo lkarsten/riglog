@@ -1,0 +1,97 @@
+#!/usr/bin/env python
+# .- coding: utf-8 -.
+"""
+Collect and store varnishstat counters every n seconds for a time period.
+
+This file is in the public domain.
+
+Author: Lasse Karstensen <lkarsten@varnish-software.com>, August 2015.
+"""
+import sys
+import subprocess
+import argparse
+from logging import basicConfig, INFO, DEBUG, info, error
+from datetime import datetime, timedelta
+from time import sleep
+from pprint import pprint
+
+
+def collect(outputfp, all_counters=False):
+    "Run varnishstat from PATH and send output to outputfp."
+    cmd = ["varnishstat", "-1", "-j"]
+
+    if not all_counters:
+        for i in ["MAIN", "MGT", "SMA", "VBE"]:
+            cmd += ["-f", i]
+
+    try:
+        proc = subprocess.check_output(cmd, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        error("Error calling varnishstat: %s" % str(e))
+        sleep(5)
+        return
+    outputfp.write(proc)
+
+    if 0:
+        import json
+        data = json.loads(proc)
+        pprint(data)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="%s - Varnish runtime counter collector" % sys.argv[0],
+        epilog="Tool to get continous collections of Varnish Cache counters.")
+    parser.add_argument("--sleep",
+                        help="Seconds to sleep between samples. (default: 5s)",
+                        metavar="seconds", type=int, default=5)
+    parser.add_argument("--stop-after",
+                        help="Stop collection after this many seconds."
+                        "(default 7200s)",
+                        metavar="seconds", type=int, default=7200)
+    parser.add_argument("-a", "--all-counters", action="store_true",
+                        help="Collect all counters, including locks "
+                        "and memory pools. (default: false)")
+    parser.add_argument("--no-progress", help="Disable progress indicator.",
+                        action="store_true")
+    parser.add_argument("-v", "--verbose", action="store_true",
+                        help="Verbose output.")
+    parser.add_argument("outputfile",
+                        help="Target file to write output to.")
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        exit()
+    args = parser.parse_args()
+
+    if args.verbose:
+        basicConfig(level=DEBUG)
+    else:
+        basicConfig(level=INFO)
+
+    t0 = datetime.now()
+    cutoff_time = t0 + timedelta(seconds=args.stop_after)
+
+    info("Will collect counters every %i seconds until %s.",
+         args.sleep, cutoff_time.isoformat())
+
+    try:
+        with open(args.outputfile, "a") as fp:
+            while True:
+                collect(fp, all_counters=args.all_counters)
+                if args.no_progress is False:
+                    sys.stdout.write(".")
+                    sys.stdout.flush()
+                if (datetime.now() + timedelta(seconds=args.sleep)
+                        > cutoff_time):
+                    break
+                sleep(args.sleep)
+        info("\nCompleted collection after %i seconds. Output written to %s.",
+             args.stop_after, args.outputfile)
+    except KeyboardInterrupt:
+        info("\nManual abort after %i seconds. Output written to %s.",
+             (datetime.now() - t0).seconds, args.outputfile)
+
+
+if __name__ == "__main__":
+    main()
