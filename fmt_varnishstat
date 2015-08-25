@@ -10,7 +10,7 @@ import sys
 import json
 from pprint import pprint
 
-def jsonsplit(fp):
+def chunksplit(fp):
     lines = []
     while True:
         buf = fp.readline()
@@ -29,7 +29,7 @@ def main():
     first = True
     fp = open(sys.argv[1])
 
-    for chunk in jsonsplit(fp):
+    for chunk in chunksplit(fp):
         sample = json.loads(chunk)
         if first:
             first = False
@@ -57,11 +57,12 @@ def main():
                 sys.stdout.write("%s" % sample[key]["value"])
         sys.stdout.write("\n")
 
-        #keyname = keyname.replace(".", "__")
-        #s = ["INSERT %s,hostname=%s " % (keyname, os.uname()[1])]
-        #assert "value" in v
-        #s += ["value=%i" % v["value"]]
-        #final = "".join(s)
+        if 0:
+            keyname = keyname.replace(".", "__")
+            s = ["INSERT %s,hostname=%s " % (keyname, os.uname()[1])]
+            assert "value" in v
+            s += ["value=%i" % v["value"]]
+            final = "".join(s)
 
 if __name__ == "__main__":
     main()

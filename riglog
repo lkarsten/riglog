@@ -24,17 +24,20 @@ mkdir -p $TODIR
 VARNISHPID=$(pgrep varnishd | tail -n1)
 
 sar -A -o "$TODIR/sar" $INTERVAL $COUNT 1>/dev/null &
+pidstat -p $VARNISHPID -d $INTERVAL $COUNT >> $TODIR/pidstat-io &
+pidstat -p $VARNISHPID -r $INTERVAL $COUNT >> $TODIR/pidstat-memory &
+pidstat -p $VARNISHPID -s $INTERVAL $COUNT >> $TODIR/pidstat-stack &
 ./varnishstatlogger $INTERVAL $COUNT >> $TODIR/varnishstat.json &
 ./runfor $INTERVAL $COUNT "cat /proc/$VARNISHPID/stat" >> $TODIR/varnish.child.stat &
 
-echo "All collection processes started. Waiting for them to finish."
-wait %1 %2 %3
-#echo "Collection finished. Preparing archive."
+echo "All processes started, data collection in progres.."
+wait %1 %2 %3 %4 %5 %6
+echo "Data collection finished. Preparing archive."
 
 # Extract the text version of the sar counters, to be sure.
 sar -f "$TODIR/sar" -A > "$TODIR/sar.txt"
 
-#TARFILE="collection-${HOSTNAME}.${ENDTIME_S}.tar.gz"
-#tar zcf $TARFILE $TODIR
+TARFILE="collection-${HOSTNAME}.${ENDTIME_S}.tar.gz"
+tar zcf $TARFILE $TODIR
 #du -hs $TODIR $TARFILE
-#echo "Please submit $TARFILE"
+echo "File to submit: $TARFILE"
