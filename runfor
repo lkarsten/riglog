@@ -7,10 +7,11 @@ shift
 shift
 
 for i in `seq 1 $count`; do
-    date "+%s.%N " | tr -d '\n'
-    eval $*
-    if [ $i == $count ]; then
-	break
-    fi
-    sleep $interval
+	date "+%s.%N " | tr -d '\n'
+
+	eval $*
+	if [ $i == $count ]; then
+		break
+	fi
+	sleep $interval
 done
