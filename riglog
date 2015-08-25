@@ -1,18 +1,22 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # Run Varnish-specific data collection.
 #
 # Author: Lasse Karstensen <lkarsten@varnish-software.com>, August 2015.
 
+INTERVAL=$1  # seconds
+COUNT=$2    # samples
+
+if [ -z "$INTERVAL" ]; then
+	echo "Usage: $0 <interval> <count>"
+	exit -1
+fi
+
 export LC_ALL=C
 export TZ=UTC
 
-P="10"
-COUNT=2
-
-ENDTIME=$(date '+%H:%M:%S' -d "$P seconds")
-ENDTIME_S=$(date '+%Y-%m-%d__%H%M%S' -d "$P seconds")
-INTERVAL=5  # seconds
+RUNTIME=$(($INTERVAL * $COUNT))
+ENDTIME_S=$(date '+%Y-%m-%d__%H%M%S' -d "$RUNTIME seconds")
 
 TODIR="${HOSTNAME}__${ENDTIME_S}-collection"
 mkdir -p $TODIR
@@ -25,9 +29,9 @@ sar -A -o "$TODIR/sar" $INTERVAL $COUNT 1>/dev/null &
 
 echo "All collection processes started. Waiting for them to finish."
 wait %1 %2 %3
-echo "Collection finished. Preparing archive."
+#echo "Collection finished. Preparing archive."
 
-# Extract the text version of the sar counters.
+# Extract the text version of the sar counters, to be sure.
 sar -f "$TODIR/sar" -A > "$TODIR/sar.txt"
 
 #TARFILE="collection-${HOSTNAME}.${ENDTIME_S}.tar.gz"
