@@ -2,6 +2,10 @@
 import sys
 from pprint import pprint
 
+if len(sys.argv) <= 1:
+    print "Usage: %s <inputfile>" % sys.argv[0]
+    exit(-1)
+
 # from http://brokestream.com/procstat.c / man 5 proc
 order = """log_ts pid tcomm state ppid pgid sid tty_nr tty_pgrp flags min_flt cmin_flt
 maj_flt cmaj_flt utime stimev cutime cstime priority nicev num_threads
