@@ -27,7 +27,7 @@ sar -A -o "$TODIR/sar" $INTERVAL $COUNT 1>/dev/null &
 pidstat -p $VARNISHPID -d $INTERVAL $COUNT >> $TODIR/pidstat-io &
 pidstat -p $VARNISHPID -r $INTERVAL $COUNT >> $TODIR/pidstat-memory &
 pidstat -p $VARNISHPID -s $INTERVAL $COUNT >> $TODIR/pidstat-stack &
-./varnishstatlogger $INTERVAL $COUNT >> $TODIR/varnishstat.json &
+./varnishstatlogger -a $INTERVAL $COUNT >> $TODIR/varnishstat.json &
 ./runfor $INTERVAL $COUNT "cat /proc/$VARNISHPID/stat" >> $TODIR/varnish.child.stat &
 
 echo "All processes started, data collection in progres.."
