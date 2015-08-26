@@ -18,11 +18,14 @@ def chunksplit(fp):
             if len(lines) > 0:
                 yield "\n".join(lines)
             break
-
-        lines += [buf[:-1]]
-        if buf == "\n":
+        elif buf == "\n":
+            continue
+        elif buf == "}\n":
+            lines += [buf]
             yield "\n".join(lines)
             lines = []
+        else:
+            lines += [buf[:-1]]
 
 
 def main():
@@ -31,6 +34,7 @@ def main():
 
     for chunk in chunksplit(fp):
         sample = json.loads(chunk)
+
         if first:
             first = False
             keys = []
