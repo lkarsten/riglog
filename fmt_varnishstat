@@ -10,7 +10,7 @@ import sys
 import json
 from pprint import pprint
 
-def chunksplit(fp):
+def jsonchunksplit(fp):
     lines = []
     while True:
         buf = fp.readline()
@@ -32,7 +32,7 @@ def main():
     first = True
     fp = open(sys.argv[1])
 
-    for chunk in chunksplit(fp):
+    for chunk in jsonchunksplit(fp):
         sample = json.loads(chunk)
 
         if first:
