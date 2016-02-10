@@ -1,0 +1,6 @@
+#!/bin/bash
+
+DATASET=$1
+mkdir -p $DATASET/gen/
+./fmt_varnishstat $DATASET/varnishstat.json  > $DATASET/gen/varnishstat.csv
+./fmt_pidstat $DATASET/varnish.child.stat > $DATASET/gen/child-pidstat.csv
