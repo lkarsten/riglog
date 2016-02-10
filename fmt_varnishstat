@@ -62,21 +62,14 @@ def main():
             keys = keyfilter(sample)
             print ",".join(keys)
 
-        for j, key in enumerate(keys):
-            if j > 0:
+        for i, key in enumerate(keys):
+            if i > 0:
                 sys.stdout.write(",")
             if key == "timestamp":
                 sys.stdout.write(sample[key])
             else:
                 sys.stdout.write("%s" % sample[key]["value"])
         sys.stdout.write("\n")
-
-        if 0:
-            keyname = keyname.replace(".", "__")
-            s = ["INSERT %s,hostname=%s " % (keyname, os.uname()[1])]
-            assert "value" in v
-            s += ["value=%i" % v["value"]]
-            final = "".join(s)
 
 if __name__ == "__main__":
     main()
