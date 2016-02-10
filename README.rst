@@ -1,4 +1,4 @@
-riglog
+Riglog
 ======
 
 Collect runtime statistics for a Varnish Cache setup, including:
@@ -10,35 +10,30 @@ Collect runtime statistics for a Varnish Cache setup, including:
 Output files are stored to disk, and tools to convert these to CSV for further
 data analysis is included.
 
-
-Requirements
-------------
-
-On Debian/Ubuntu systems:
-
-    apt-get install sysstat
-
-
 Usage
 -----
 
+::
     ./riglog INTERVAL COUNT
 
-To sample every INTERVAL (in seconds) for COUNT times.
+To sample every `INTERVAL` [seconds] for `COUNT` times.
 
-Good values to start with are INTERVAL=1 and COUNT=10 to make sure
+Good values to start with are `INTERVAL` of 1 and `COUNT` of 10 to make sure
 everything is working.
 
 Data collections from production should be at least 15 minutes long.
 
 Output files are written to a subdirectory. (hostname__TIMESTAMP/ )
 
+Installation
+------------
+
+On Debian/Ubuntu systems::
+
+    apt-get install sysstat
+
 
 Contact
 -------
 
-If you have any questions regarding this shell hack, contact
-me at lkarsten@__no_spam__varnish-software.com.
-
-Varnish Software customers are recommended to use normal support channels.
-
+If you have any questions regarding this script, contact <lkarsten@__no_spam_please__varnish-software.com>.
