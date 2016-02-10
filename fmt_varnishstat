@@ -28,28 +28,38 @@ def jsonchunksplit(fp):
             lines += [buf[:-1]]
 
 
+def keyfilter(sample):
+    keys = []
+    for k, values in sample.items():
+        if k == "timestamp":
+            continue
+        elif k.startswith("VBE."):
+            continue
+        elif k.startswith("MEMPOOL."):
+            continue
+        elif k.startswith("LCK."):
+            continue
+        elif k.endswith(".happy"):
+            continue
+        # For now only consider counters, no gauges.
+        elif values["flag"] != "c":
+            continue
+
+        keys.append(k)
+    keys.sort()
+    keys.insert(0, "timestamp")
+    return keys
+
+
 def main():
-    first = True
+    keys = None
     fp = open(sys.argv[1])
 
     for chunk in jsonchunksplit(fp):
         sample = json.loads(chunk)
 
-        if first:
-            first = False
-            keys = []
-            for k in sample.keys():
-                if k == "timestamp":
-                    continue
-                if k.startswith("VBE."):
-                    continue
-                if k.endswith(".happy"):
-                    continue
-                if not k.startswith("SMA"): continue
-                keys.append(k)
-
-            keys.sort()
-            keys.insert(0, "timestamp")
+        if keys is None:
+            keys = keyfilter(sample)
             print ",".join(keys)
 
         for j, key in enumerate(keys):
